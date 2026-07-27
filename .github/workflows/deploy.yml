@@ -44,9 +44,8 @@ jobs:
             fi
 
             echo "Flowise API authentication successful."
-            echo "Agentflow response fields:"
 
-                        echo "Response size:"
+            echo "Response size:"
             wc -c /tmp/agentflow-response.json
 
             echo "Response content:"
