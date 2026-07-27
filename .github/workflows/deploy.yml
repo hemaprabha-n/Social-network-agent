@@ -1,1 +1,29 @@
+name: Deploy Social Network Agent
 
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "social-network-agent.json"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            cd /home/ubuntu/Social-network-agent
+
+            git pull origin main
+
+            echo "Repository updated successfully"
+
+            ls -lh social-network-agent.json
