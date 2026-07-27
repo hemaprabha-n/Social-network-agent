@@ -16,6 +16,7 @@ jobs:
     steps:
       - name: Test Flowise API from EC2
         uses: appleboy/ssh-action@v1.0.3
+
         env:
           FLOWISE_API_KEY: ${{ secrets.FLOWISE_API_KEY }}
 
@@ -43,3 +44,15 @@ jobs:
             fi
 
             echo "Flowise API authentication successful."
+            echo "Agentflow response fields:"
+
+            python3 - <<'PY'
+            import json
+
+            with open("/tmp/agentflow-response.json", "r") as f:
+                data = json.load(f)
+
+            print("Top-level fields:")
+            for key in data.keys():
+                print("-", key)
+            PY
