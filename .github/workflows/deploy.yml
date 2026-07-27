@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test Flowise API from EC2
+      - name: Deploy Agentflow to Flowise
         uses: appleboy/ssh-action@v1.0.3
 
         env:
@@ -27,27 +27,71 @@ jobs:
           envs: FLOWISE_API_KEY
 
           script: |
-            echo "Testing Flowise Agentflow API..."
+            set -e
+
+            REPO="/home/ubuntu/Social-network-agent"
+            FLOW_ID="ff97cbbd-f246-4c94-9c73-c9bd553f2544"
+            URL="http://localhost:3000/api/v1/chatflows/$FLOW_ID"
+
+            echo "Updating repository..."
+
+            cd "$REPO"
+            git pull origin main
+
+            echo "Validating JSON..."
+
+            python3 -m json.tool social-network-agent.json > /dev/null
+
+            echo "Creating backup of current Flowise Agentflow..."
+
+            curl -fsS \
+              -H "Authorization: Bearer $FLOWISE_API_KEY" \
+              "$URL" \
+              -o /tmp/social-network-agent-backup.json
+
+            echo "Backup created."
+
+            echo "Preparing deployment payload..."
+
+            python3 - <<'PY'
+            import json
+
+            with open("social-network-agent.json", "r", encoding="utf-8") as f:
+                exported = json.load(f)
+
+            # Flowise stores the graph itself inside flowData.
+            flow_data = {
+                "nodes": exported["nodes"],
+                "edges": exported["edges"]
+            }
+
+            payload = {
+                "flowData": json.dumps(flow_data)
+            }
+
+            with open("/tmp/social-network-agent-payload.json", "w", encoding="utf-8") as f:
+                json.dump(payload, f)
+
+            print("Payload prepared successfully.")
+            PY
+
+            echo "Updating existing Flowise Agentflow..."
 
             HTTP_CODE=$(curl -sS \
-              -o /tmp/agentflow-response.json \
+              -o /tmp/update-response.json \
               -w "%{http_code}" \
+              -X PUT \
               -H "Authorization: Bearer $FLOWISE_API_KEY" \
-              "http://localhost:3000/api/v1/chatflows/ff97cbbd-f246-4c94-9c73-c9bd553f2544")
+              -H "Content-Type: application/json" \
+              --data-binary @/tmp/social-network-agent-payload.json \
+              "$URL")
 
-            echo "HTTP status: $HTTP_CODE"
+            echo "Flowise returned HTTP $HTTP_CODE"
 
-            if [ "$HTTP_CODE" -ne 200 ]; then
-              echo "Flowise API test failed."
-              cat /tmp/agentflow-response.json
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+              echo "Deployment failed."
+              cat /tmp/update-response.json
               exit 1
             fi
 
-            echo "Flowise API authentication successful."
-
-            echo "Response size:"
-            wc -c /tmp/agentflow-response.json
-
-            echo "Response content:"
-            cat /tmp/agentflow-response.json
-            echo
+            echo "Deployment successful."
