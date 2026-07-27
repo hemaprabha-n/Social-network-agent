@@ -281,7 +281,7 @@
         ],
         "inputs": {
           "agentName": " FacebookCaptionWriter",
-          "systemMessagePrompt": "You are a professional Facebook social media content writer.\n\nCreate a Facebook caption based on the user's topic.\n\nRequirements:\n- Write between 80 and 150 words.\n- Use a clear and engaging opening.\n- Use a professional and friendly tone.\n- Use no more than 4 emojis.\n- Add one clear call to action.\n- Add exactly 5 relevant hashtags.\n- Do not invent facts, prices, statistics, awards, or customer numbers.\n- Return only the final caption.",
+          "systemMessagePrompt": "You are a professional Facebook social media content writer for engaging posts.\n\nCreate a Facebook caption based on the user's topic.\n\nRequirements:\n- Write between 80 and 150 words.\n- Use a clear and engaging opening.\n- Use a professional and friendly tone.\n- Use no more than 4 emojis.\n- Add one clear call to action.\n- Add exactly 5 relevant hashtags.\n- Do not invent facts, prices, statistics, awards, or customer numbers.\n- Return only the final caption.",
           "messageHistory": "",
           "conversationHistorySelection": "all_messages",
           "humanMessagePrompt": "",
