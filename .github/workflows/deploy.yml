@@ -33,7 +33,7 @@ jobs:
               -o /tmp/agentflow-response.json \
               -w "%{http_code}" \
               -H "Authorization: Bearer $FLOWISE_API_KEY" \
-              "http://localhost:3000/api/v1/agentflows/ff97cbbd-f246-4c94-9c73-c9bd553f2544")
+              "http://localhost:3000/api/v1/chatflows/ff97cbbd-f246-4c94-9c73-c9bd553f2544")
 
             echo "HTTP status: $HTTP_CODE"
 
