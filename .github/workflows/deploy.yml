@@ -7,23 +7,39 @@ on:
     paths:
       - "social-network-agent.json"
 
+  workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to EC2
+      - name: Test Flowise API from EC2
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          FLOWISE_API_KEY: ${{ secrets.FLOWISE_API_KEY }}
+
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: FLOWISE_API_KEY
 
           script: |
-            cd /home/ubuntu/Social-network-agent
+            echo "Testing Flowise Agentflow API..."
 
-            git pull origin main
+            HTTP_CODE=$(curl -sS \
+              -o /tmp/agentflow-response.json \
+              -w "%{http_code}" \
+              -H "Authorization: Bearer $FLOWISE_API_KEY" \
+              "http://localhost:3000/api/v1/agentflows/ff97cbbd-f246-4c94-9c73-c9bd553f2544")
 
-            echo "Repository updated successfully"
+            echo "HTTP status: $HTTP_CODE"
 
-            ls -lh social-network-agent.json
+            if [ "$HTTP_CODE" -ne 200 ]; then
+              echo "Flowise API test failed."
+              cat /tmp/agentflow-response.json
+              exit 1
+            fi
+
+            echo "Flowise API authentication successful."
