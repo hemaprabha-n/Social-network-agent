@@ -1,0 +1,1 @@
+0 6 * * * /home/ubuntu/run-social-agent.sh >> /home/ubuntu/social-agent.log 2>&1
