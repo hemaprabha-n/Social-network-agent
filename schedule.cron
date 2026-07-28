@@ -1,1 +1,2 @@
 30 4 * * * /home/ubuntu/run-social-agent.sh >> /home/ubuntu/social-agent.log 2>&1
+30 8 * * * /home/ubuntu/run-social-agent.sh >> /home/ubuntu/social-agent.log 2>&1
