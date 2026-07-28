@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "social-network-agent.json"
+      - "schedule.cron"
+      - ".github/workflows/deploy.yml"
 
   workflow_dispatch:
 
@@ -14,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Agentflow to Flowise
+      - name: Deploy Agentflow and Schedule to EC2
         uses: appleboy/ssh-action@v1.0.3
 
         env:
@@ -38,7 +40,31 @@ jobs:
             cd "$REPO"
             git pull origin main
 
-            echo "Validating JSON..."
+            # ============================================
+            # UPDATE CRON SCHEDULE
+            # ============================================
+
+            echo "Validating schedule.cron..."
+
+            if [ ! -f schedule.cron ]; then
+              echo "schedule.cron not found."
+              exit 1
+            fi
+
+            echo "Installing cron schedule..."
+
+            crontab schedule.cron
+
+            echo "Current crontab:"
+            crontab -l
+
+            echo "Cron schedule installed successfully."
+
+            # ============================================
+            # DEPLOY FLOWISE AGENTFLOW
+            # ============================================
+
+            echo "Validating Agentflow JSON..."
 
             python3 -m json.tool social-network-agent.json > /dev/null
 
@@ -59,7 +85,6 @@ jobs:
             with open("social-network-agent.json", "r", encoding="utf-8") as f:
                 exported = json.load(f)
 
-            # Flowise stores the graph itself inside flowData.
             flow_data = {
                 "nodes": exported["nodes"],
                 "edges": exported["edges"]
@@ -94,4 +119,5 @@ jobs:
               exit 1
             fi
 
-            echo "Deployment successful."
+            echo "Flowise deployment successful."
+            echo "Automation deployment completed."
