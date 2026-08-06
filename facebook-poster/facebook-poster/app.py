@@ -1,6 +1,7 @@
 import os
 import random
 import traceback
+import time
 
 from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
@@ -10,6 +11,7 @@ from image_editor import ImageEditor
 from facebook_publisher import FacebookPublisher
 from knowledge import router as knowledge_router
 from config import OUTPUT_DIR
+
 
 app = FastAPI(
     title="Facebook Poster API",
