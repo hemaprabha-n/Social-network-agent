@@ -70,10 +70,12 @@ def process_and_post_task(data: ImageRequest):
 
         print("🎨 Generating Image...")
 
-        generated_image = generator.generate(
-            prompt=enhanced_prompt
-        )
+        start = time.time()
 
+        generated_image = generator.generate(
+        prompt=enhanced_prompt
+        )
+        print(f"✅ Image Generation Time: {time.time() - start:.2f} seconds")
         # -----------------------------------
         # Detect Hiring Post
         # -----------------------------------
@@ -153,26 +155,23 @@ def process_and_post_task(data: ImageRequest):
         # Edit Image
         # -----------------------------------
 
-        final_image = os.path.join(
+       final_image = os.path.join(
             OUTPUT_DIR,
             "final_post.jpg"
         )
 
-        print("🖌 Editing Image...")
+        print("🖌️ Editing Image...")
 
+        start = time.time()
         editor.process_image(
+        input_path=generated_image,
+        output_path=final_image,
+        title=data.title,
+        subtitle=data.subtitle,
+        hiring=data.hiring
+)
 
-            input_path=generated_image,
-
-            output_path=final_image,
-
-            title=data.title,
-
-            subtitle=data.subtitle,
-
-            hiring=is_hiring
-
-        )
+print(f"✅ Image Editing Time: {time.time() - start:.2f} seconds")
 
         # -----------------------------------
         # Hashtags
@@ -201,20 +200,14 @@ def process_and_post_task(data: ImageRequest):
         # Publish
         # -----------------------------------
 
-        print("🚀 Publishing to Facebook...")
+       print("🚀 Publishing to Facebook...")
 
+        start = time.time()
         fb_response = publisher.publish(
-
-            image_path=final_image,
-
-            caption=final_caption
-
+        image_path=final_image,
+        caption=data.caption
         )
-
-        print(
-            f"✅ SUCCESS! Facebook Post ID: {fb_response.get('id')}"
-        )
-
+print(f"✅ Facebook Upload Time: {time.time() - start:.2f} seconds")
         print(
             "🏁 BACKGROUND TASK FINISHED".center(60, "=")
         )
