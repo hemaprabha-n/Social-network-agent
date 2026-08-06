@@ -155,7 +155,7 @@ def process_and_post_task(data: ImageRequest):
         # Edit Image
         # -----------------------------------
 
-       final_image = os.path.join(
+        final_image = os.path.join(
             OUTPUT_DIR,
             "final_post.jpg"
         )
@@ -171,7 +171,7 @@ def process_and_post_task(data: ImageRequest):
         hiring=data.hiring
 )
 
-print(f"✅ Image Editing Time: {time.time() - start:.2f} seconds")
+        print(f"✅ Image Editing Time: {time.time() - start:.2f} seconds")
 
         # -----------------------------------
         # Hashtags
@@ -200,14 +200,14 @@ print(f"✅ Image Editing Time: {time.time() - start:.2f} seconds")
         # Publish
         # -----------------------------------
 
-       print("🚀 Publishing to Facebook...")
+        print("🚀 Publishing to Facebook...")
 
         start = time.time()
         fb_response = publisher.publish(
         image_path=final_image,
         caption=data.caption
         )
-print(f"✅ Facebook Upload Time: {time.time() - start:.2f} seconds")
+        print(f"✅ Facebook Upload Time: {time.time() - start:.2f} seconds")
         print(
             "🏁 BACKGROUND TASK FINISHED".center(60, "=")
         )
